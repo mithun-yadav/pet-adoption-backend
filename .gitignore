@@ -1,0 +1,20 @@
+node_modules/
+.env
+.DS_Store
+*.log
+coverage/
+dist/
+build/
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+yarn-error.log
+
+# Optional: Yarn offline mirror
+npm-packages-offline-cache/
