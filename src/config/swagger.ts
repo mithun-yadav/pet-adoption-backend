@@ -24,17 +24,13 @@ const swaggerDocument: any = {
       },
     },
   },
-  security: [
-    {
-      bearerAuth: [],
-    },
-  ],
   paths: {
     // Auth
     "/api/auth/register": {
       post: {
         tags: ["Auth"],
         summary: "Register a new user",
+        security: [], // Public endpoint
         requestBody: {
           required: true,
           content: {
@@ -63,6 +59,7 @@ const swaggerDocument: any = {
       post: {
         tags: ["Auth"],
         summary: "Login user",
+        security: [], // Public endpoint
         requestBody: {
           required: true,
           content: {
@@ -99,6 +96,7 @@ const swaggerDocument: any = {
       post: {
         tags: ["Auth"],
         summary: "Refresh access token",
+        security: [], // Public endpoint
         requestBody: {
           required: true,
           content: {
@@ -125,6 +123,7 @@ const swaggerDocument: any = {
       get: {
         tags: ["Pets"],
         summary: "List pets with optional filters and pagination",
+        security: [], // Public endpoint
         parameters: [
           { name: "page", in: "query", schema: { type: "integer" } },
           { name: "limit", in: "query", schema: { type: "integer" } },
@@ -183,6 +182,7 @@ const swaggerDocument: any = {
       get: {
         tags: ["Pets"],
         summary: "Get a single pet by ID",
+        security: [], // Public endpoint
         parameters: [
           {
             name: "id",
