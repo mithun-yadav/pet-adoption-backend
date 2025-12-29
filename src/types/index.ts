@@ -1,13 +1,12 @@
-import { Request } from 'express';
-import { Document } from 'mongoose';
+import { Request } from "express";
+import { Document } from "mongoose";
 
 // User Types
 export interface IUser extends Document {
-  _id: string;
   name: string;
   email: string;
   password: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
   phone?: string;
   address?: string;
   createdAt: Date;
@@ -17,17 +16,16 @@ export interface IUser extends Document {
 
 // Pet Types
 export interface IPet extends Document {
-  _id: string;
   name: string;
-  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+  species: "dog" | "cat" | "bird" | "rabbit" | "other";
   breed: string;
   age: number;
-  gender: 'male' | 'female';
-  size?: 'small' | 'medium' | 'large';
+  gender: "male" | "female";
+  size?: "small" | "medium" | "large";
   color?: string;
   description: string;
   photo?: string;
-  status: 'available' | 'pending' | 'adopted';
+  status: "available" | "pending" | "adopted";
   vaccinated: boolean;
   neutered: boolean;
   addedBy: string;
@@ -37,13 +35,12 @@ export interface IPet extends Document {
 
 // Application Types
 export interface IApplication extends Document {
-  _id: string;
   pet: string;
   user: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   reason: string;
   experience: string;
-  livingSpace: 'apartment' | 'house' | 'farm';
+  livingSpace: "apartment" | "house" | "farm";
   hasOtherPets: boolean;
   adminNotes?: string;
   reviewedBy?: string;
@@ -91,11 +88,11 @@ export interface LoginDTO {
 
 export interface CreatePetDTO {
   name: string;
-  species: 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+  species: "dog" | "cat" | "bird" | "rabbit" | "other";
   breed: string;
   age: number;
-  gender: 'male' | 'female';
-  size?: 'small' | 'medium' | 'large';
+  gender: "male" | "female";
+  size?: "small" | "medium" | "large";
   color?: string;
   description: string;
   photo?: string;
@@ -107,12 +104,12 @@ export interface CreateApplicationDTO {
   petId: string;
   reason: string;
   experience: string;
-  livingSpace: 'apartment' | 'house' | 'farm';
+  livingSpace: "apartment" | "house" | "farm";
   hasOtherPets: boolean;
 }
 
 export interface ReviewApplicationDTO {
-  status: 'approved' | 'rejected';
+  status: "approved" | "rejected";
   adminNotes?: string;
 }
 
@@ -133,6 +130,6 @@ export interface AuthResponse {
   name: string;
   email: string;
   role: string;
-  token: string;
+  accessToken: string;
   refreshToken: string;
 }
