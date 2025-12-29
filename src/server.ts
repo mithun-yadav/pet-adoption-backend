@@ -5,6 +5,7 @@ import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import petRoutes from "./routes/petRoutes";
 import applicationRoutes from "./routes/applicationRoutes";
+import { setupSwagger } from "./config/swagger";
 
 // Load env vars
 dotenv.config();
@@ -20,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS
 app.use(cors());
+
+// Swagger docs
+setupSwagger(app);
 
 // Mount routers
 app.use("/api/auth", authRoutes);
