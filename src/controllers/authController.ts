@@ -1,6 +1,6 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import User from '../models/User';
-import { generateToken } from '../middleware/auth';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../middleware/auth';
 import { AuthRequest, RegisterDTO, LoginDTO, ApiResponse, AuthResponse } from '../types';
 
 // @desc    Register user
@@ -36,7 +36,8 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id)
+        token: generateAccessToken(user._id),
+        refreshToken: generateRefreshToken(user._id)
       }
     };
 
@@ -83,7 +84,8 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
         name: user.name,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id)
+        token: generateAccessToken(user._id),
+        refreshToken: generateRefreshToken(user._id)
       }
     };
 
@@ -106,6 +108,59 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(200).json({
       success: true,
       data: user
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message
+    } as ApiResponse);
+  }
+};
+
+// @desc    Refresh access token using refresh token
+// @route   POST /api/auth/refresh-token
+// @access  Public (secured by refresh token)
+export const refreshToken = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { refreshToken } = req.body as { refreshToken?: string };
+
+    if (!refreshToken) {
+      res.status(400).json({
+        success: false,
+        message: 'Refresh token is required'
+      } as ApiResponse);
+      return;
+    }
+
+    let decoded;
+    try {
+      decoded = verifyRefreshToken(refreshToken);
+    } catch {
+      res.status(401).json({
+        success: false,
+        message: 'Invalid or expired refresh token'
+      } as ApiResponse);
+      return;
+    }
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        message: 'User not found'
+      } as ApiResponse);
+      return;
+    }
+
+    const newAccessToken = generateAccessToken(user._id);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        token: newAccessToken,
+        refreshToken
+      }
     } as ApiResponse);
   } catch (error) {
     res.status(500).json({
