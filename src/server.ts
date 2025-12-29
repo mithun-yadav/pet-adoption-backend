@@ -30,7 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/pets", petRoutes);
 app.use("/api/applications", applicationRoutes);
 
-// Health check route
+// Health check route //
 app.get("/", (_req: Request, res: Response) => {
   res.json({
     success: true,
