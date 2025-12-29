@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: pet-adoption-backend
+    env: node
+    buildCommand: yarn install && yarn build
+    startCommand: node dist/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # Add your other environment variables in Render dashboard:
+      # - MONGO_URI
+      # - JWT_SECRET
+      # - JWT_REFRESH_SECRET (optional)
+      # - JWT_EXPIRE (optional)
+      # - JWT_ACCESS_EXPIRE (optional)
+      # - JWT_REFRESH_EXPIRE (optional)
+
