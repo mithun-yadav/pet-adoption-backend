@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 import User from "../models/User";
 import {
   generateAccessToken,
@@ -9,9 +10,37 @@ import {
   AuthRequest,
   RegisterDTO,
   LoginDTO,
+  ForgotPasswordDTO,
+  ResetPasswordDTO,
+  ChangePasswordDTO,
   ApiResponse,
   AuthResponse,
 } from "../types";
+
+// Generate a random reset token
+const generateResetToken = (): string => {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let token = "";
+  for (let i = 0; i < 40; i++) {
+    token += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return token;
+};
+
+// Hash reset token using bcrypt
+const hashResetToken = async (token: string): Promise<string> => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(token, salt);
+};
+
+// Compare reset token
+const compareResetToken = async (
+  token: string,
+  hashedToken: string
+): Promise<boolean> => {
+  return await bcrypt.compare(token, hashedToken);
+};
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -105,6 +134,151 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
     };
 
     res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    } as ApiResponse);
+  }
+};
+
+// @desc    Forgot password - generate reset token
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { email }: ForgotPasswordDTO = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "No user found with that email",
+      } as ApiResponse);
+      return;
+    }
+
+    // Create reset token
+    const resetToken = generateResetToken();
+    const resetPasswordToken = await hashResetToken(resetToken);
+
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await user.save({ validateBeforeSave: false });
+
+    // In a real app, you would send this via email.
+    // For now, return the token so the frontend can use it.
+    res.status(200).json({
+      success: true,
+      message: "Password reset token generated",
+      data: {
+        resetToken,
+      },
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    } as ApiResponse);
+  }
+};
+
+// @desc    Reset password using token
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+export const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { token } = req.params;
+    const { password }: ResetPasswordDTO = req.body;
+
+    // Find all users with valid reset tokens and check them
+    const users = await User.find({
+      resetPasswordExpire: { $gt: new Date() },
+      resetPasswordToken: { $exists: true },
+    }).select("+password");
+
+    let user = null;
+    for (const u of users) {
+      if (
+        u.resetPasswordToken &&
+        (await compareResetToken(token, u.resetPasswordToken))
+      ) {
+        user = u;
+        break;
+      }
+    }
+
+    if (!user) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid or expired password reset token",
+      } as ApiResponse);
+      return;
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully",
+    } as ApiResponse);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    } as ApiResponse);
+  }
+};
+
+// @desc    Change password (authenticated user)
+// @route   POST /api/auth/change-password
+// @access  Private
+export const changePassword = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { currentPassword, newPassword }: ChangePasswordDTO = req.body;
+
+    const user = await User.findById(req.user?._id).select("+password");
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      } as ApiResponse);
+      return;
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+
+    if (!isMatch) {
+      res.status(400).json({
+        success: false,
+        message: "Current password is incorrect",
+      } as ApiResponse);
+      return;
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    } as ApiResponse);
   } catch (error) {
     res.status(500).json({
       success: false,

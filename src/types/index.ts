@@ -9,6 +9,8 @@ export interface IUser extends Document {
   role: "user" | "admin";
   phone?: string;
   address?: string;
+  resetPasswordToken?: string;
+  resetPasswordExpire?: Date;
   createdAt: Date;
   updatedAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
@@ -84,6 +86,19 @@ export interface RegisterDTO {
 export interface LoginDTO {
   email: string;
   password: string;
+}
+
+export interface ForgotPasswordDTO {
+  email: string;
+}
+
+export interface ResetPasswordDTO {
+  password: string;
+}
+
+export interface ChangePasswordDTO {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface CreatePetDTO {

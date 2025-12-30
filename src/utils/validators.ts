@@ -32,6 +32,26 @@ export const loginValidation: ValidationChain[] = [
   body('password').notEmpty().withMessage('Password is required')
 ];
 
+// Forgot password validation rules
+export const forgotPasswordValidation: ValidationChain[] = [
+  body('email').isEmail().withMessage('Please provide a valid email')
+];
+
+// Reset password validation rules
+export const resetPasswordValidation: ValidationChain[] = [
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters')
+];
+
+// Change password validation rules (authenticated)
+export const changePasswordValidation: ValidationChain[] = [
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters')
+];
+
 // Pet validation rules
 export const petValidation: ValidationChain[] = [
   body('name').trim().notEmpty().withMessage('Pet name is required'),
