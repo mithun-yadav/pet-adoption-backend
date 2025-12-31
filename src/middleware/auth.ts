@@ -75,9 +75,6 @@ export const generateRefreshToken = (id: string): string => {
   return jwt.sign({ id }, refreshSecret, options);
 };
 
-// Backwards compatible alias (was previously the only token)
-export const generateToken = generateAccessToken;
-
 // Verify refresh token and return user id
 export const verifyRefreshToken = (token: string): { id: string } => {
   const refreshSecret =

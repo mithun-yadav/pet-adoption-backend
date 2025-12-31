@@ -5,11 +5,13 @@ A comprehensive REST API for managing pet adoptions with role-based authenticati
 ## 🚀 Features
 
 ### User Roles
+
 - **Visitor**: Browse pets, search, filter
 - **User**: Register, login, apply for adoption, track applications
 - **Admin**: Full CRUD on pets, manage applications, approve/reject
 
 ### Core Functionality
+
 - JWT-based authentication with role-based authorization
 - Pet management with search, filters, and pagination
 - Adoption application workflow
@@ -27,22 +29,26 @@ A comprehensive REST API for managing pet adoptions with role-based authenticati
 ## 🛠️ Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone <your-repo-url>
 cd pet-adoption-backend
 ```
 
 2. **Install dependencies**
+
 ```bash
 yarn install
 ```
 
 3. **Set up environment variables**
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` with your configuration:
+
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/pet-adoption
@@ -52,11 +58,13 @@ NODE_ENV=development
 ```
 
 4. **Start MongoDB** (if running locally)
+
 ```bash
 mongod
 ```
 
 5. **Run the server**
+
 ```bash
 # Development mode with auto-restart and TypeScript compilation
 yarn dev
@@ -113,6 +121,7 @@ pet-adoption-backend/
 The project includes comprehensive TypeScript types for all entities:
 
 ### Main Interfaces
+
 - `IUser` - User document interface
 - `IPet` - Pet document interface
 - `IApplication` - Application document interface
@@ -122,12 +131,13 @@ The project includes comprehensive TypeScript types for all entities:
 All types are defined in `src/types/index.ts` for easy importing:
 
 ```typescript
-import { IUser, IPet, AuthRequest, CreatePetDTO } from '../types';
+import { IUser, IPet, AuthRequest, CreatePetDTO } from "../types";
 ```
 
 ## 📚 API Documentation
 
 ### Base URL
+
 ```
 http://localhost:5000/api
 ```
@@ -135,6 +145,7 @@ http://localhost:5000/api
 ### Authentication Endpoints
 
 #### Register User
+
 ```http
 POST /auth/register
 Content-Type: application/json
@@ -149,6 +160,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -163,6 +175,7 @@ Content-Type: application/json
 ```
 
 #### Login
+
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -174,6 +187,7 @@ Content-Type: application/json
 ```
 
 #### Get Current User
+
 ```http
 GET /auth/me
 Authorization: Bearer <token>
@@ -182,11 +196,13 @@ Authorization: Bearer <token>
 ### Pet Endpoints
 
 #### Get All Pets (Public)
+
 ```http
 GET /pets?page=1&limit=10&species=dog&search=golden&status=available
 ```
 
 **Query Parameters:**
+
 - `page` - Page number (default: 1)
 - `limit` - Items per page (default: 10)
 - `species` - Filter: dog, cat, bird, rabbit, other
@@ -196,6 +212,7 @@ GET /pets?page=1&limit=10&species=dog&search=golden&status=available
 - `search` - Search by name or breed
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -208,11 +225,13 @@ GET /pets?page=1&limit=10&species=dog&search=golden&status=available
 ```
 
 #### Get Single Pet
+
 ```http
 GET /pets/:id
 ```
 
 #### Create Pet (Admin Only)
+
 ```http
 POST /pets
 Authorization: Bearer <admin-token>
@@ -234,18 +253,21 @@ Content-Type: application/json
 ```
 
 #### Update Pet (Admin Only)
+
 ```http
 PUT /pets/:id
 Authorization: Bearer <admin-token>
 ```
 
 #### Delete Pet (Admin Only)
+
 ```http
 DELETE /pets/:id
 Authorization: Bearer <admin-token>
 ```
 
 #### Update Pet Status (Admin Only)
+
 ```http
 PATCH /pets/:id/status
 Authorization: Bearer <admin-token>
@@ -259,6 +281,7 @@ Content-Type: application/json
 ### Application Endpoints
 
 #### Create Application (User)
+
 ```http
 POST /applications
 Authorization: Bearer <user-token>
@@ -274,18 +297,21 @@ Content-Type: application/json
 ```
 
 #### Get My Applications (User)
+
 ```http
 GET /applications/my-applications
 Authorization: Bearer <user-token>
 ```
 
 #### Get All Applications (Admin)
+
 ```http
 GET /applications?page=1&limit=10&status=pending
 Authorization: Bearer <admin-token>
 ```
 
 #### Review Application (Admin)
+
 ```http
 PATCH /applications/:id/review
 Authorization: Bearer <admin-token>
@@ -318,7 +344,7 @@ Or create a TypeScript seeder script.
 1. **Register** → Get JWT token
 2. **Browse pets** (public, no auth)
 3. **User applies** → Pet status: `pending`
-4. **Admin reviews** → 
+4. **Admin reviews** →
    - Approve → Pet: `adopted`, other apps rejected
    - Reject → Check pending apps, set `available` if none
 
@@ -353,6 +379,7 @@ The compiled files will be in the `dist/` directory.
 ## 📦 Key Dependencies
 
 **Production:**
+
 - `express` - Web framework
 - `mongoose` - MongoDB ODM
 - `jsonwebtoken` - JWT authentication
@@ -362,6 +389,7 @@ The compiled files will be in the `dist/` directory.
 - `dotenv` - Environment variables
 
 **Development:**
+
 - `typescript` - TypeScript compiler
 - `ts-node` - TypeScript execution
 - `ts-node-dev` - Dev server with auto-restart
@@ -390,6 +418,7 @@ The compiled files will be in the `dist/` directory.
 ### Environment Variables (Production)
 
 Required for deployment:
+
 - `MONGODB_URI` - MongoDB connection string
 - `JWT_SECRET` - Strong secret key
 - `JWT_EXPIRE` - Token expiration
